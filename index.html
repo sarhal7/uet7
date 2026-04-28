@@ -13,6 +13,10 @@
   <link rel="stylesheet" href="news.css">
 </head>
 <body>
+  <!-- Custom cursor (desktop only) -->
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+
   <!-- Loading Screen -->
   <div class="loading-screen">
     <div class="loader-content">
@@ -123,6 +127,7 @@
   </footer>
 
   <script>
+    /* ── Loading screen ─────────────────────────────── */
     document.addEventListener('DOMContentLoaded', function() {
       const loadingScreen = document.querySelector('.loading-screen');
       const mainContent = document.querySelector('.main-content');
@@ -139,6 +144,7 @@
             setTimeout(() => {
               loadingScreen.style.display = 'none';
               mainContent.style.opacity = '1';
+              initScrollReveal();
             }, 500);
           }, 500);
           return;
@@ -150,6 +156,94 @@
 
       const progressInterval = setInterval(updateProgress, 30);
     });
+
+    /* ── Scroll Reveal ──────────────────────────────── */
+    function initScrollReveal() {
+      const targets = document.querySelectorAll('.news-card, .section-header');
+      targets.forEach(el => el.classList.add('scroll-reveal'));
+
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            const siblings = Array.from(
+              entry.target.parentElement.querySelectorAll('.scroll-reveal')
+            );
+            const idx = siblings.indexOf(entry.target);
+            entry.target.style.transitionDelay = (idx * 0.12) + 's';
+            entry.target.classList.add('in-view');
+            observer.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+
+      targets.forEach(el => observer.observe(el));
+    }
+
+    /* ── Custom Cursor ──────────────────────────────── */
+    (function() {
+      // Only activate on pointer-fine devices (mouse / trackpad)
+      if (!window.matchMedia('(pointer: fine)').matches) return;
+
+      const dot  = document.querySelector('.cursor-dot');
+      const ring = document.querySelector('.cursor-ring');
+      let mx = 0, my = 0, rx = 0, ry = 0;
+
+      document.addEventListener('mousemove', (e) => {
+        mx = e.clientX;
+        my = e.clientY;
+        dot.style.left = mx + 'px';
+        dot.style.top  = my + 'px';
+        dot.style.opacity  = '1';
+        ring.style.opacity = '1';
+      });
+
+      document.addEventListener('mouseleave', () => {
+        dot.style.opacity  = '0';
+        ring.style.opacity = '0';
+      });
+
+      // Smooth lagging ring
+      (function animateRing() {
+        rx += (mx - rx) * 0.13;
+        ry += (my - ry) * 0.13;
+        ring.style.left = rx + 'px';
+        ring.style.top  = ry + 'px';
+        requestAnimationFrame(animateRing);
+      })();
+
+      // Hover states on interactive elements
+      document.addEventListener('mouseover', (e) => {
+        if (e.target.closest('a, button')) {
+          dot.classList.add('hovered');
+          ring.classList.add('hovered');
+        }
+      });
+      document.addEventListener('mouseout', (e) => {
+        if (e.target.closest('a, button')) {
+          dot.classList.remove('hovered');
+          ring.classList.remove('hovered');
+        }
+      });
+
+      // Click sparkles
+      const COLORS = ['#16a34a', '#fbbf24', '#ffffff', '#86efac', '#fde68a'];
+      document.addEventListener('click', (e) => {
+        for (let i = 0; i < 8; i++) {
+          const p = document.createElement('div');
+          p.className = 'cursor-particle';
+          const angle = (i / 8) * 360 + Math.random() * 20;
+          const dist  = 28 + Math.random() * 36;
+          p.style.cssText =
+            'left:' + e.clientX + 'px;' +
+            'top:'  + e.clientY + 'px;' +
+            'background:' + COLORS[i % COLORS.length] + ';' +
+            '--tx:' + (Math.cos(angle * Math.PI / 180) * dist).toFixed(1) + 'px;' +
+            '--ty:' + (Math.sin(angle * Math.PI / 180) * dist).toFixed(1) + 'px;';
+          document.body.appendChild(p);
+          setTimeout(() => p.remove(), 700);
+        }
+      });
+    })();
   </script>
 </body>
 </html>
