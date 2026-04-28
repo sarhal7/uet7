@@ -16,8 +16,6 @@
   align-items: center;
   gap: 0.75rem;
   margin-bottom: 3rem;
-  opacity: 0;
-  animation: fadeIn 0.8s ease forwards;
 }
 
 .section-header svg {
@@ -46,15 +44,16 @@
   border-radius: 0.75rem;
   overflow: hidden;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  opacity: 0;
-  animation: fadeIn 0.8s ease forwards;
+  transition: transform 0.35s ease, box-shadow 0.35s ease, opacity 0.7s ease;
   border-top: 4px solid #fbbf24;
 }
 
+.news-card:nth-child(2) { transition-delay: 0.15s; }
+.news-card:nth-child(3) { transition-delay: 0.3s; }
+
 .news-card:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 10px 20px -3px rgba(22, 163, 74, 0.2);
+  transform: translateY(-6px);
+  box-shadow: 0 16px 30px -4px rgba(22, 163, 74, 0.25);
 }
 
 .news-image {
