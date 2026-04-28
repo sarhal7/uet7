@@ -13,6 +13,10 @@
   <link rel="stylesheet" href="news.css">
 </head>
 <body>
+  <!-- Custom cursor -->
+  <div class="cursor-dot" id="cursorDot"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+
   <!-- Loading Screen -->
   <div class="loading-screen">
     <div class="loader-content">
@@ -72,12 +76,12 @@
 
     <section class="news">
       <div class="container">
-        <div class="section-header">
+        <div class="section-header reveal">
           <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path><path d="M18 14h-8"></path><path d="M15 18h-5"></path><path d="M10 6h8v4h-8V6Z"></path></svg>
           <h2>Latest News</h2>
         </div>
         <div class="news-grid">
-          <article class="news-card">
+          <article class="news-card reveal" data-reveal-delay="0.1">
             <div class="news-image">
               <video src="goal video.mp4" height="200px" autoplay muted></video>
             </div>
@@ -88,7 +92,7 @@
               <button class="read-more">Read More →</button>
             </div>
           </article>
-          <article class="news-card">
+          <article class="news-card reveal" data-reveal-delay="0.25">
             <div class="news-image">
               <img src="image 2.webp" alt="Transfer News">
             </div>
@@ -99,7 +103,7 @@
               <button class="read-more">Read More →</button>
             </div>
           </article>
-          <article class="news-card">
+          <article class="news-card reveal" data-reveal-delay="0.4">
             <div class="news-image">
               <img src="ahmed.jpg" alt="Golden Boot">
             </div>
@@ -123,11 +127,12 @@
   </footer>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
+    /* ── Loading screen ───────────────────────────────────── */
+    document.addEventListener('DOMContentLoaded', function () {
       const loadingScreen = document.querySelector('.loading-screen');
-      const mainContent = document.querySelector('.main-content');
-      const progress = document.querySelector('.progress');
-      const progressText = document.querySelector('.progress-text');
+      const mainContent   = document.querySelector('.main-content');
+      const progress      = document.querySelector('.progress');
+      const progressText  = document.querySelector('.progress-text');
       let width = 0;
 
       function updateProgress() {
@@ -139,6 +144,7 @@
             setTimeout(() => {
               loadingScreen.style.display = 'none';
               mainContent.style.opacity = '1';
+              initAnimations();
             }, 500);
           }, 500);
           return;
@@ -150,6 +156,92 @@
 
       const progressInterval = setInterval(updateProgress, 30);
     });
+
+    /* ── All post-load animations ─────────────────────────── */
+    function initAnimations() {
+
+      /* ── Custom cursor ──────────────────────────────────── */
+      const dot  = document.getElementById('cursorDot');
+      const ring = document.getElementById('cursorRing');
+
+      if (dot && ring && window.matchMedia('(pointer: fine)').matches) {
+        let mouseX = 0, mouseY = 0;
+        let ringX  = 0, ringY  = 0;
+
+        document.addEventListener('mousemove', function (e) {
+          mouseX = e.clientX;
+          mouseY = e.clientY;
+          dot.style.left = mouseX + 'px';
+          dot.style.top  = mouseY + 'px';
+        });
+
+        (function animateRing() {
+          ringX += (mouseX - ringX) * 0.12;
+          ringY += (mouseY - ringY) * 0.12;
+          ring.style.left = ringX + 'px';
+          ring.style.top  = ringY + 'px';
+          requestAnimationFrame(animateRing);
+        })();
+
+        document.querySelectorAll('a, button, .news-card').forEach(function (el) {
+          el.addEventListener('mouseenter', function () { document.body.classList.add('cursor-hover'); });
+          el.addEventListener('mouseleave', function () { document.body.classList.remove('cursor-hover'); });
+        });
+      }
+
+      /* ── Scroll-reveal (IntersectionObserver) ───────────── */
+      const revealEls = document.querySelectorAll('.reveal');
+      if ('IntersectionObserver' in window) {
+        const io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (entry) {
+            if (entry.isIntersecting) {
+              const delay = parseFloat(entry.target.dataset.revealDelay || 0) * 1000;
+              setTimeout(function () {
+                entry.target.classList.add('visible');
+              }, delay);
+              io.unobserve(entry.target);
+            }
+          });
+        }, { threshold: 0.15 });
+
+        revealEls.forEach(function (el) { io.observe(el); });
+      } else {
+        revealEls.forEach(function (el) { el.classList.add('visible'); });
+      }
+
+      /* ── Hero particles ─────────────────────────────────── */
+      const hero = document.querySelector('.hero');
+      if (hero) {
+        for (let i = 0; i < 22; i++) {
+          const p    = document.createElement('div');
+          p.className = 'particle';
+          const size = Math.random() * 4 + 2;
+          const left = Math.random() * 100;
+          const dur  = Math.random() * 18 + 10;
+          const del  = -(Math.random() * 20);
+          const alpha = (Math.random() * 0.35 + 0.1).toFixed(2);
+          p.style.cssText =
+            'width:' + size + 'px;height:' + size + 'px;' +
+            'left:' + left + '%;bottom:-10px;' +
+            'background:rgba(251,191,36,' + alpha + ');' +
+            'animation-duration:' + dur + 's;' +
+            'animation-delay:' + del + 's;';
+          hero.appendChild(p);
+        }
+      }
+
+      /* ── Navbar scroll effect ───────────────────────────── */
+      const navbar = document.querySelector('.navbar');
+      if (navbar) {
+        window.addEventListener('scroll', function () {
+          if (window.scrollY > 60) {
+            navbar.classList.add('scrolled');
+          } else {
+            navbar.classList.remove('scrolled');
+          }
+        }, { passive: true });
+      }
+    }
   </script>
 </body>
 </html>

@@ -111,6 +111,86 @@
   100% { transform: translateX(100%); }
 }
 
+/* Smooth scrolling (respects reduced-motion preference) */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+/* Custom cursor (pointer devices only) */
+.cursor-dot,
+.cursor-ring {
+  display: none;
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 99999;
+  transform: translate(-50%, -50%);
+  will-change: left, top;
+}
+
+@media (pointer: fine) {
+  body { cursor: none; }
+  a, button { cursor: none; }
+
+  .cursor-dot {
+    display: block;
+    width: 8px;
+    height: 8px;
+    background: #fbbf24;
+    transition: transform 0.1s ease, opacity 0.3s ease;
+  }
+
+  .cursor-ring {
+    display: block;
+    width: 40px;
+    height: 40px;
+    border: 2px solid rgba(251, 191, 36, 0.7);
+    background: transparent;
+    transition: width 0.3s ease, height 0.3s ease, border-color 0.3s ease, background 0.3s ease;
+  }
+
+  body.cursor-hover .cursor-dot {
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  body.cursor-hover .cursor-ring {
+    width: 60px;
+    height: 60px;
+    border-color: #16a34a;
+    background: rgba(22, 163, 74, 0.12);
+  }
+}
+
+/* Scroll-reveal base */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.7s ease, transform 0.7s ease;
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Hero particles */
+.particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 1;
+  animation: particleFloat linear infinite;
+}
+
+@keyframes particleFloat {
+  0%   { transform: translateY(0) rotate(0deg);    opacity: 0; }
+  8%   { opacity: 1; }
+  92%  { opacity: 1; }
+  100% { transform: translateY(-110vh) rotate(720deg); opacity: 0; }
+}
+
 /* Base styles and resets */
 :root {
   --color-primary: #16a34a;
@@ -216,7 +296,8 @@ body {
   background: url('football12.jpeg');
   background-size: cover;
   background-position: center;
-  animation: kenBurns 20s ease infinite alternate;
+  animation: heroPan 30s ease-in-out infinite;
+  overflow: hidden;
 }
 
 .hero::before {
@@ -325,10 +406,12 @@ footer p {
   100% { background-position: 0% 50%; }
 }
 
-@keyframes kenBurns {
-  0% { transform: scale(1) translate(0, 0); }
-  50% { transform: scale(1.1) translate(-1%, -1%); }
-  100% { transform: scale(1) translate(0, 0); }
+@keyframes heroPan {
+  0%   { background-position: 50% 50%; }
+  25%  { background-position: 52% 48%; }
+  50%  { background-position: 48% 52%; }
+  75%  { background-position: 51% 49%; }
+  100% { background-position: 50% 50%; }
 }
 
 @keyframes contentFadeIn {
