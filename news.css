@@ -1,8 +1,14 @@
 /* News section styles */
 .news {
   padding: 5rem 0;
-  background-color: #f9fafb;
-  background-image: url(Slayer\ Fc.jpg);
+  background-color: #f0fdf4;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 59px,
+    rgba(22, 163, 74, 0.08) 59px,
+    rgba(22, 163, 74, 0.08) 60px
+  );
 }
 
 .section-header {
@@ -23,6 +29,10 @@
 .section-header h2 {
   font-size: 2rem;
   color: var(--color-text);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-family: 'Oswald', system-ui, sans-serif;
+  font-weight: 700;
 }
 
 .news-grid {
@@ -39,11 +49,12 @@
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   opacity: 0;
   animation: fadeIn 0.8s ease forwards;
+  border-top: 4px solid #fbbf24;
 }
 
 .news-card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 10px 20px -3px rgba(22, 163, 74, 0.2);
 }
 
 .news-image {
